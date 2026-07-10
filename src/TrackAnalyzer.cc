@@ -87,6 +87,11 @@ private:
   std::vector<float> trk_pt;
   std::vector<float> trk_eta;
   std::vector<float> trk_phi;
+  std::vector<float> trk_px;
+  std::vector<float> trk_py;
+  std::vector<float> trk_pz;
+  std::vector<float> trk_charge;
+  std::vector<float> trk_z0;
   std::vector<float> trk_d0;
   std::vector<int> trk_jetIdx;
 
@@ -132,6 +137,11 @@ TrackAnalyzer::TrackAnalyzer(const edm::ParameterSet &iConfig)
   tree_->Branch("trk_pt", &trk_pt);
   tree_->Branch("trk_eta", &trk_eta);
   tree_->Branch("trk_phi", &trk_phi);
+  tree_->Branch("trk_px", &trk_px);
+  tree_->Branch("trk_py", &trk_py);
+  tree_->Branch("trk_pz", &trk_pz);
+  tree_->Branch("trk_charge", &trk_charge);
+  tree_->Branch("trk_z0", &trk_z0);
   tree_->Branch("trk_d0", &trk_d0);
   tree_->Branch("trk_jetIdx", &trk_jetIdx);
 
@@ -171,6 +181,11 @@ void TrackAnalyzer::analyze(const edm::Event &iEvent, const edm::EventSetup &iSe
   trk_pt.clear();
   trk_eta.clear();
   trk_phi.clear();
+  trk_px.clear();
+  trk_py.clear();
+  trk_pz.clear();
+  trk_charge.clear();
+  trk_z0.clear();
   trk_d0.clear();
   trk_jetIdx.clear();
   jet_pt.clear();
@@ -251,9 +266,15 @@ void TrackAnalyzer::analyze(const edm::Event &iEvent, const edm::EventSetup &iSe
     trk_pt.push_back(trk.pt());
     trk_eta.push_back(trk.eta());
     trk_phi.push_back(trk.phi());
+    trk_px.push_back(trk.px());
+    trk_py.push_back(trk.py());
+    trk_pz.push_back(trk.pz());
+    trk_charge.push_back(trk.charge());
 
     float d0 = trk.dxy(pv.position());
+    float z0 = trk.dz(pv.position());
     trk_d0.push_back(d0);
+    trk_z0.push_back(z0);
 
     // Match track to nearest jet
     int matchedJetIdx = -1;

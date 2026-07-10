@@ -14,7 +14,7 @@ process.source = cms.Source("PoolSource",
         # "root://eospublic.cern.ch//eos/opendata/cms/Run2010B/MultiJet/AOD/Apr21ReReco-v1/0000/002A8227-7471-E011-9632-002618943838.root"
         # "root://eospublic.cern.ch//eos/opendata/cms/Run2010A/MinimumBias/AOD/Apr21ReReco-v1/0000/0030CAFF-0B6D-E011-8202-0025902008DC.root"
 
-        *list(open("datasets/CMS_Run2010B_MultiJet_AOD_Apr21ReReco-v1_0000_file_index.txt","r").read().splitlines())
+        *list(open("/home/cms-opendata/CMSSW_4_2_8/src/LLP/TrackAnalyzer/datasets/CMS_Run2010B_MultiJet_AOD_Apr21ReReco-v1_0000_file_index.txt","r").read().splitlines())
     )   
 )
 
