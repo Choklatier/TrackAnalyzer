@@ -1,4 +1,5 @@
 import FWCore.ParameterSet.Config as cms
+import FWCore.PythonUtilities.LumiList as LumiList
 
 process = cms.Process("LLP")
 
@@ -17,6 +18,12 @@ process.source = cms.Source("PoolSource",
         *list(open("/home/cms-opendata/CMSSW_4_2_8/src/LLP/TrackAnalyzer/datasets/CMS_Run2010B_MultiJet_AOD_Apr21ReReco-v1_0000_file_index.txt","r").read().splitlines())
     )   
 )
+
+# Filter for good quality data
+goodJSON = "/home/cms-opendata/CMSSW_4_2_8/src/LLP/TrackAnalyzer/Cert_136033-149442_7TeV_Apr21ReReco_Collisions10_JSON_v2.txt"
+myLumis = LumiList.LumiList(filename=goodJSON).getCMSSWString().split(",")
+process.source.lumisToProcess = cms.untracked.VLuminosityBlockRange()
+process.source.lumisToProcess.extend(myLumis)
 
 process.TFileService = cms.Service("TFileService",
     fileName = cms.string("output.root")
