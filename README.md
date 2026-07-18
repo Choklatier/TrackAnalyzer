@@ -1,8 +1,8 @@
 # Track Analyzer
 
-The code is written to be used in [a old VMs to access CMS Open data from Run1](https://opendata.cern.ch/record/250). Dataset such, as the [2010B MinimumBias](https://opendata.cern.ch/record/42), can be ran on using this setup.
+The code is written to be used in [an old VMs to access CMS Open data from Run1](https://opendata.cern.ch/record/250). Datasets like the [2010B MinimumBias](https://opendata.cern.ch/record/42) can be ran on using this setup.
 
-[This tutorial](https://opendata.cern.ch/docs/cms-virtual-machine-2010) indicates how to setup the CMS software.
+[This tutorial](https://opendata.cern.ch/docs/cms-virtual-machine-2010) indicates how to setup the CMS software.\ 
 As a short summary, once the VM is acquired:
 ```
 cmsrel CMSSW_4_2_8 
@@ -15,7 +15,8 @@ scram b
 cmsRun python/trackanalyzer_cfi.py
 ```
 
-In order to have a better experience editing the code, the repository may be cloned outside the VM and the files transfered to the VM. An example of how to do so is as follows:
+## Code Editing tips
+In order to have a better experience editing the code, the repository may be cloned outside the VM and the files transfered to the VM. An example of how to do so is as follows:\
 In the VM, attribute a local ip address to the VM:
 ```
 sudo ifconfig eth1 192.168.56.10 netmask 255.255.255.0 up
