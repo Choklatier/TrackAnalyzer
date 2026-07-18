@@ -269,6 +269,9 @@ void TrackAnalyzer::analyze(const edm::Event &iEvent, const edm::EventSetup &iSe
   for (size_t j = 0; j < jets->size(); j++)
   {
     const reco::PFJet &jet = jets->at(j);
+    if (jet.pt() < 20){ // 20 GeV cut on jets
+      break;
+    }
     jet_pt.push_back(jet.pt());
     jet_eta.push_back(jet.eta());
     jet_phi.push_back(jet.phi());
