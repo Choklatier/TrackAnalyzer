@@ -82,6 +82,8 @@ private:
   float met_phi;
   int nTrack;
   int nJet;
+  int nVertex;
+  float H_T;
 
   // Track variables
   std::vector<float> trk_pt;
@@ -133,6 +135,8 @@ TrackAnalyzer::TrackAnalyzer(const edm::ParameterSet &iConfig)
   tree_->Branch("met_phi", &met_phi, "met_phi/F");
   tree_->Branch("nTrack", &nTrack, "nTrack/I");
   tree_->Branch("nJet", &nJet, "nJet/I");
+  tree_->Branch("nVertex", &nVertex, "nVertex/I");
+  tree_->Branch("H_T", &H_T, "H_T/F");
 
   tree_->Branch("trk_pt", &trk_pt);
   tree_->Branch("trk_eta", &trk_eta);
@@ -161,6 +165,15 @@ TrackAnalyzer::~TrackAnalyzer()
 //
 // member functions
 //
+
+// Struct to define iterator to sort tracks by pT
+struct TrackPtSorter
+{
+  bool operator()(const reco::Track* a, const reco::Track* b) const
+  {
+    return a->pt() > b->pt(); // descending pT
+  }
+};
 
 // ------------ method called for each event  ------------
 void TrackAnalyzer::analyze(const edm::Event &iEvent, const edm::EventSetup &iSetup)
@@ -192,6 +205,14 @@ void TrackAnalyzer::analyze(const edm::Event &iEvent, const edm::EventSetup &iSe
   jet_eta.clear();
   jet_phi.clear();
   jet_mass.clear();
+
+  // reset event level observables
+  met_pt = -99;
+  met_phi = -99;
+  nTrack = -99;
+  nJet = -99;
+  nVertex = -99;
+  H_T = -99;
 
   // Get collections
   edm::Handle<reco::TrackCollection> tracks;
@@ -240,8 +261,11 @@ void TrackAnalyzer::analyze(const edm::Event &iEvent, const edm::EventSetup &iSe
     return;
   const reco::Vertex &pv = vertices->front();
 
+  nVertex = vertices->size();
+
   // Fill jet information
   nJet = 0;
+  H_T = 0;
   for (size_t j = 0; j < jets->size(); j++)
   {
     const reco::PFJet &jet = jets->at(j);
@@ -250,18 +274,47 @@ void TrackAnalyzer::analyze(const edm::Event &iEvent, const edm::EventSetup &iSe
     jet_phi.push_back(jet.phi());
     jet_mass.push_back(jet.mass());
     nJet++;
+    H_T += jet.pt();
   }
 
   nTrack = 0;
+  
+  // Sort tracks per pT
+  std::vector<const reco::Track*> sortedTracks;
+  sortedTracks.reserve(tracks->size());
+
+ reco::TrackCollection::const_iterator it;
+  for (it = tracks->begin(); it != tracks->end(); ++it)
+  {
+    sortedTracks.push_back(&(*it));
+  }
+  
+  std::sort(sortedTracks.begin(), sortedTracks.end(), TrackPtSorter());
+
 
   // for (const auto& trk : *tracks) {
   for (size_t i = 0; i < tracks->size(); i++)
   {
-    const reco::Track &trk = tracks->at(i);
-    if (!trk.quality(reco::TrackBase::highPurity))
+    // const reco::Track &trk = tracks->at(i);
+    const reco::Track &trk = *sortedTracks[i]; //tracks->at(i);
+
+    // Require high purity for the tracks
+    if (!trk.quality(reco::TrackBase::highPurity)) 
       continue;
-    if (trk.pt() < 1.0)
+    
+    // require a minimum number of valid hits
+    if (trk.numberOfValidHits() < 6){
       continue;
+    }
+
+    // require decent chi2
+    if (trk.normalizedChi2() >= 5){
+      continue;
+    }
+
+    // Minimum pT cut
+    if (trk.pt() < 1.0) // Stop when tracks at lower than 1 GeV
+      break;
 
     trk_pt.push_back(trk.pt());
     trk_eta.push_back(trk.eta());
@@ -299,6 +352,11 @@ void TrackAnalyzer::analyze(const edm::Event &iEvent, const edm::EventSetup &iSe
     trk_jetIdx.push_back(matchedJetIdx);
 
     nTrack++;
+  }
+
+  // Ask for a minimum amount of tracks for the events!
+  if (nTrack < 5){
+    return;
   }
 
   tree_->Fill();
