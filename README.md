@@ -1,5 +1,5 @@
 # Track Analyzer
-
+## Setup
 The code is written to be used in [an old VMs to access CMS Open data from Run1](https://opendata.cern.ch/record/250). Datasets like the [2010B MinimumBias](https://opendata.cern.ch/record/42) can be ran on using this setup.
 
 [This tutorial](https://opendata.cern.ch/docs/cms-virtual-machine-2010) indicates how to setup the CMS software.\ 
@@ -9,7 +9,7 @@ cmsrel CMSSW_4_2_8
 cd CMSSW_4_2_8/src/
 cmsenv
 ```
-Then copy the content of this repository into this path. Compiling and running can be done by executing the following:
+Then copy the content of this repository into a folder located at this path. Compiling and running can be done by executing the following:
 ```
 scram b
 cmsRun python/trackanalyzer_cfi.py
